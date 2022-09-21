@@ -1,0 +1,27 @@
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10em;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3em;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+
+.loading {
+  opacity: 0;
+  text-align: center;
+  transition: all .1s ease;
+  &[data-show="true"] {
+    opacity: 1;
+  }
+}

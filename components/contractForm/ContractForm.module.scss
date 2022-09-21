@@ -1,0 +1,26 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+
+  .input {
+    display: block;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.tip {
+  font-size: 0.7em;
+}
