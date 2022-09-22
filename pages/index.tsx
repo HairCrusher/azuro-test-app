@@ -8,13 +8,11 @@ import {useEffect, useState} from "react";
 import {TestTaskContract, TestTaskContract__factory, USDT, USDT__factory} from "../contracts";
 import {BigNum, getNumber} from "../utils";
 import {TEST_TASK_ADDRESS, USDT_CONTRACT_ADDRESS} from "../constants/addresses";
-import {BigNumber, ethers} from "ethers";
+import {BigNumber} from "ethers";
 
 import styles from '../styles/App.module.scss';
 import {TransactionsHistoryItemProps} from "../components/transactionsHistory/TransactionsHistoryItem";
 import {TransactionsHistoryList} from "../components/transactionsHistory/TransactionsHistoryList";
-
-let etherscanProvider = new ethers.providers.EtherscanProvider();
 
 const App: NextPage = () => {
 
@@ -30,7 +28,7 @@ const App: NextPage = () => {
 
     const [transactions, setTransactions] = useState<TransactionsHistoryItemProps[]>([]);
 
-    const updateBalances = async (_USDTContract?: USDT, _TestTaskC?: TestTaskContract, _account?: string | null) => {
+    const updateBalances = async (_USDTContract?: USDT | null, _TestTaskC?: TestTaskContract | null, _account?: string | null) => {
         if (_USDTContract && _TestTaskC && _account) {
             _USDTContract.balanceOf(_account)
                 .then(setUSDTBalance)
@@ -95,14 +93,8 @@ const App: NextPage = () => {
     }, [library]);
 
     useEffect(() => {
-        updateBalances(USDTContract!, TestTaskC!, account).then()
+        updateBalances(USDTContract, TestTaskC, account).then()
     }, [USDTContract, TestTaskC, account]);
-
-    useEffect(() => {
-        etherscanProvider.getHistory(TEST_TASK_ADDRESS).then(x => {
-            console.log('getHistory', x);
-        })
-    }, []);
 
     const handleProvide = async ({value}: FormState) => {
 
@@ -112,14 +104,18 @@ const App: NextPage = () => {
 
         const sum = BigNumber.from(value).mul(BigNumber.from(BigNum));
 
-        const approve = await USDTContract.approve(TestTaskC.address, sum);
+        try {
+            const approve = await USDTContract.approve(TestTaskC.address, sum);
 
 
-        setLoading(true);
-        await approve.wait();
+            setLoading(true);
+            await approve.wait();
 
-        const transaction = await TestTaskC.provide(sum);
-        await transaction.wait();
+            const transaction = await TestTaskC.provide(sum);
+            await transaction.wait();
+        } catch (e: any) {
+            console.error(e.message);
+        }
         setLoading(false);
     }
 
@@ -130,9 +126,13 @@ const App: NextPage = () => {
 
         const sum = BigNumber.from(value).mul(BigNumber.from(BigNum));
 
-        setLoading(true);
-        const transaction = await TestTaskC.withdraw(sum);
-        await transaction.wait();
+        try {
+            setLoading(true);
+            const transaction = await TestTaskC.withdraw(sum);
+            await transaction.wait();
+        } catch (e: any) {
+            console.error(e.message);
+        }
         setLoading(false);
     }
 
